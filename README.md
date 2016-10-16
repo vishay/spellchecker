@@ -11,3 +11,7 @@ from SpellCheckAPI import SpellCheckAPI
 s = SpellCheckAPI()
 s.spellcheck(t)
 ```
+# Todos
+1. spellcheck() fails on unicode -- fix this
+2. fetch html content from web, rather than static local file
+3. spellchecker should return context (+/- 10 words around typo)
