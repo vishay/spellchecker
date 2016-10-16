@@ -10,13 +10,16 @@ class SpellCheckAPI:
 	def spellcheck(self, text):
 		import ast, base64, httplib, urllib
 
-		self.params = urllib.urlencode({'text': text, 'mode' : 'proof'})
+		# needed or else the string is too long, and the request 414s
+		t = text[1350:1500]
+
+		self.params = urllib.urlencode({'text': t, 'mode' : 'proof'})
 
 		self.response_dict = {}
 		try:
 			conn = httplib.HTTPSConnection(self.API)
-			conn.request('GET', '/bing/v5.0/spellcheck/?%s' % self.params, '{body}', self.headers)
-			
+			conn.request('POST', '/bing/v5.0/spellcheck/?%s' % self.params, '{body}', self.headers)
+
 			response = conn.getresponse()
 			response_str = response.read()
 
@@ -25,7 +28,7 @@ class SpellCheckAPI:
 			conn.close()
 
 		except Exception as e:
-			print("[Errno {0}] {1}".format(e.errno, e.strerror))
+			print('[Errno {0}] {1}'.format(e.errno, e.strerror))
 
 		return self.response_dict
 
