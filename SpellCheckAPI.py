@@ -10,27 +10,45 @@ class SpellCheckAPI:
 	def spellcheck(self, text):
 		import ast, base64, httplib, urllib
 
-		# needed or else the string is too long, and the request 414s
-		t = text[1350:1500]
+		
+		# iterate through the string, in blocks of max_length characters
 
-		self.params = urllib.urlencode({'text': t, 'mode' : 'proof'})
+		# split the text up by spaces, to make sure we aren't splitting words
+		list_text = text.split(" ")
 
-		self.response_dict = {}
-		try:
-			conn = httplib.HTTPSConnection(self.API)
-			conn.request('POST', '/bing/v5.0/spellcheck/?%s' % self.params, '{body}', self.headers)
+		l = len(list_text)
+		max_length = 100
+		iterations = l / max_length + 1
+		iteration = 0
 
-			response = conn.getresponse()
-			response_str = response.read()
+		self.suggestions = []
+		while iteration < iterations:
+			first = iteration * max_length
+			last = (iteration + 1) * max_length
+			iteration = iteration + 1
+			buff = list_text[first:last]
+			t = " ".join(buff)
+	
+			# format the request
+			print t
+			params = urllib.urlencode({'text': t.encode('utf-8'), 'mode' : 'proof'})
+			try:
+				conn = httplib.HTTPSConnection(self.API)
+				conn.request('POST', '/bing/v5.0/spellcheck/?%s' % params, '{body}', self.headers)
 
-			self.response_dict = ast.literal_eval(response_str)
+				response = conn.getresponse()
+				response_str = response.read()
 
-			conn.close()
+				response_dict = ast.literal_eval(response_str)
+				conn.close()
 
-		except Exception as e:
-			print('[Errno {0}] {1}'.format(e.errno, e.strerror))
+				if response_dict['flaggedTokens'] and response_dict['flaggedTokens']:
+					self.suggestions.append(response_dict)
 
-		return self.response_dict
+			except Exception as e:
+				print('[Errno {0}] {1}'.format(e.errno, e.strerror))
+
+		return self.suggestions
 
 	def get_replacements_list(self): 
 
