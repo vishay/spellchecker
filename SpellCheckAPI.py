@@ -30,7 +30,6 @@ class SpellCheckAPI:
 			t = " ".join(buff)
 	
 			# format the request
-			print t
 			params = urllib.urlencode({'text': t.encode('utf-8'), 'mode' : 'proof'})
 			try:
 				conn = httplib.HTTPSConnection(self.API)
