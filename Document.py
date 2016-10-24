@@ -57,4 +57,4 @@ class Document:
 	def pretty_print(self, obj):
 		import pprint
 		pp = pprint.PrettyPrinter(indent = 4)
-		print pp.pprint(obj)
+		return pp.pprint(obj)

@@ -1,5 +1,5 @@
 
-class SpellCheckAPI:
+class SpellcheckAPI:
 	
 	def __init__(self):
 		self.API = 'api.cognitive.microsoft.com'
@@ -10,7 +10,6 @@ class SpellCheckAPI:
 	def spellcheck(self, text):
 		import ast, base64, httplib, urllib
 
-		
 		# iterate through the string, in blocks of max_length characters
 
 		# split the text up by spaces, to make sure we aren't splitting words
@@ -50,7 +49,6 @@ class SpellCheckAPI:
 		return self.suggestions
 
 	def get_replacements_list(self): 
-
 		flagged_tokens = self.response_dict["flaggedTokens"]
 
 		l = []
