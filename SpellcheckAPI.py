@@ -1,4 +1,3 @@
-
 class SpellcheckAPI:
 	
 	def __init__(self):
