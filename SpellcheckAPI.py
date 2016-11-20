@@ -1,7 +1,7 @@
 class SpellcheckAPI:
 	
 	def __init__(self):
-		self.api = 'https://api.cognitive.microsoft.com'
+		self.api = 'https://api.cognitive.microsoft.com/bing/v5.0/spellcheck/?'
 
 		self.auth_key = '95da5684bc6645a389bc35ba71732796'
 		self.headers = { 'Ocp-Apim-Subscription-Key': self.auth_key }
@@ -31,7 +31,7 @@ class SpellcheckAPI:
 			# format the request
 			params = {'text': t, 'mode' : 'proof'}
 			try:
-				response = requests.post(self.api + '/bing/v5.0/spellcheck/?', headers = self.headers, data = params)
+				response = requests.post(self.api, headers = self.headers, data = params)
 				
 				response_dict = ast.literal_eval(response.text)
 

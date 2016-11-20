@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
-from collections import deque
+from queue import Queue
 import re
-import requests
-import requests.exceptions
+from requests import *
+from threading import Thread
 import time
 from urlparse import urlsplit
 import whois
@@ -19,7 +19,7 @@ class EmailScraper:
 			return
 
 		urls_file = open(self.file)
-		urls = deque()
+		urls = Queue()
 
 		for url in urls_file.readlines():
 			urls.append(url)
@@ -55,45 +55,60 @@ class EmailScraper:
 		print emails
 		return emails
 
+	def fetch_whois(self, url):
+		print url
+
+		parts = urlsplit(url)
+		base_url = '{0.netloc}'.format(parts)
+
+		# strip off www.
+		if base_url.startswith('www.'):
+			base_url = base_url[4:]
+
+		# get whois content
+		w = whois.whois(base_url)
+
+		if w.emails:
+			print w.emails
+
+		return w.emails
+
+	def fetch_whois_wrapper(self, urls_q):
+		
+		url_emails = {}
+
+		while not urls_q.empty():
+			url = urls_q.get()
+			emails = self.fetch_whois(url)
+			time.sleep(0.05)
+
+			if emails:
+				if url in url_emails:
+					url_emails[url].append(emails)
+
+				else:
+					url_emails[url] = emails
+
+		print url_emails
+
 	def scrape_whois(self):
 		if not self.file:
 			print 'no input file. set input file'
 			return
 
-		urls_file = open(self.file)
-		urls = deque()
+		urls_data = open('samples/urls.txt')
+		urls = urls_data.readlines()
+		urls_q = Queue()
+		for url in urls:
+			urls_q.put(url)
 
-		for url in urls_file.readlines():
-			urls.append(url)
+		whois_threads = []
+		for i in range(10):
+			t = Thread(target=self.fetch_whois_wrapper, args=(urls_q, ))
+			whois_threads.append(t)
 
-		# set of crawled urls
-		processed_urls = set()
-
-		# email result set
-		emails = {}
-
-		# iterate through urls
-		while len(urls):
-			url = urls.popleft()
-			processed_urls.add(url)
-
-			# get base url and path to resolve relative links
-			parts = urlsplit(url)
-			base_url = '{0.netloc}'.format(parts)
-			
-			# strip off www.
-			if base_url.startswith('www.'):
-				base_url = base_url[4:]
-
-			# get whois content
-			w = whois.whois(base_url)
-
-
-			if w.emails:
-				emails[base_url] = w.emails
-
-			# delay to prevent whois ratelimiting
-			time.sleep(0.05)
-
-		return emails
+		for thread in whois_threads:
+			thread.start()
+		for thread in whois_threads:
+			thread.join()
 

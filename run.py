@@ -17,7 +17,6 @@ def fetch_url(url):
 
 		parts = urlsplit(url)
 		url_name = '{0.netloc}'.format(parts)
-		print url_name
 
 		file_name = 'samples/output/%s' % url_name
 		f = open(file_name, 'w')
@@ -49,30 +48,33 @@ def spellcheck_wrapper(content_q):
 		if file_name:
 			spellcheck(file_name)
 
-urls_data = open('samples/urls.txt')
-urls = urls_data.readlines()
-urls_q = Queue()
-for url in urls:
-	urls_q.put(url)
+# urls_data = open('samples/urls.txt')
+# urls = urls_data.readlines()
+# urls_q = Queue()
+# for url in urls:
+# 	urls_q.put(url)
 
-content_q = Queue()
+# content_q = Queue()
 
-fetch_threads = []
-for i in range(10):
-	t = Thread(target=fetch_url_wrapper, args=(urls_q, content_q, ))
-	fetch_threads.append(t)
+# fetch_threads = []
+# for i in range(10):
+# 	t = Thread(target=fetch_url_wrapper, args=(urls_q, content_q, ))
+# 	fetch_threads.append(t)
 
-spellcheck_threads = []
-for i in range(10):
-	t = Thread(target=spellcheck_wrapper, args=(content_q, ))
-	spellcheck_threads.append(t)
+# spellcheck_threads = []
+# for i in range(10):
+# 	t = Thread(target=spellcheck_wrapper, args=(content_q, ))
+# 	spellcheck_threads.append(t)
 
-for thread in fetch_threads:
-	thread.start()
-for thread in fetch_threads:
-	thread.join()
+# for thread in fetch_threads:
+# 	thread.start()
+# for thread in fetch_threads:
+# 	thread.join()
 
-for thread in spellcheck_threads:
-	thread.start()
-for thread in spellcheck_threads:
-	thread.join()
+# for thread in spellcheck_threads:
+# 	thread.start()
+# for thread in spellcheck_threads:
+# 	thread.join()
+
+e = EmailScraper('samples/urls.txt')
+e.scrape_whois()
