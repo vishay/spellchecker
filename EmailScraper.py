@@ -49,7 +49,7 @@ class EmailScraper:
 				continue
 
 			# regexp for emails
-			new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
+			new_emails = set(re.findall(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+', response.text, re.I))
 			emails.update(new_emails)
 
 		print emails
@@ -70,7 +70,7 @@ class EmailScraper:
 		processed_urls = set()
 
 		# email result set
-		emails = set()
+		emails = {}
 
 		# iterate through urls
 		while len(urls):
@@ -88,9 +88,9 @@ class EmailScraper:
 			# get whois content
 			w = whois.whois(base_url)
 
+
 			if w.emails:
-				for email in w.emails:
-					emails.add(email)
+				emails[base_url] = w.emails
 
 			# delay to prevent whois ratelimiting
 			time.sleep(0.05)

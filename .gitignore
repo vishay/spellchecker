@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Data
+samples/output/*
+
+# Random Mac files
+*.DS_Store

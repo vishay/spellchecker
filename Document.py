@@ -7,7 +7,7 @@ class Document:
 		self.soup = BeautifulSoup(open(filename), 'html.parser')
 
 		# clean the doc 
-		for script in self.soup(["script", "style"]):
+		for script in self.soup(['script', 'style']):
 		   script.replaceWith(' ')    # rip it out
 
 		# get all the text from the document

@@ -1,18 +1,19 @@
 class SpellcheckAPI:
 	
 	def __init__(self):
-		self.API = 'api.cognitive.microsoft.com'
+		self.api = 'https://api.cognitive.microsoft.com'
 
-		self.AUTH_KEY = '95da5684bc6645a389bc35ba71732796'
-		self.headers = { 'Ocp-Apim-Subscription-Key': self.AUTH_KEY }
+		self.auth_key = '95da5684bc6645a389bc35ba71732796'
+		self.headers = { 'Ocp-Apim-Subscription-Key': self.auth_key }
 	
 	def spellcheck(self, text):
-		import ast, base64, httplib, urllib
+		import ast, base64
+		import requests
 
 		# iterate through the string, in blocks of max_length characters
 
 		# split the text up by spaces, to make sure we aren't splitting words
-		list_text = text.split(" ")
+		list_text = text.split(' ')
 
 		l = len(list_text)
 		max_length = 100
@@ -25,21 +26,16 @@ class SpellcheckAPI:
 			last = (iteration + 1) * max_length
 			iteration = iteration + 1
 			buff = list_text[first:last]
-			t = " ".join(buff)
+			t = ' '.join(buff)
 	
 			# format the request
-			params = urllib.urlencode({'text': t.encode('utf-8'), 'mode' : 'proof'})
+			params = {'text': t, 'mode' : 'proof'}
 			try:
-				conn = httplib.HTTPSConnection(self.API)
-				conn.request('POST', '/bing/v5.0/spellcheck/?%s' % params, '{body}', self.headers)
+				response = requests.post(self.api + '/bing/v5.0/spellcheck/?', headers = self.headers, data = params)
+				
+				response_dict = ast.literal_eval(response.text)
 
-				response = conn.getresponse()
-				response_str = response.read()
-
-				response_dict = ast.literal_eval(response_str)
-				conn.close()
-
-				if response_dict['flaggedTokens'] and response_dict['flaggedTokens']:
+				if 'flaggedTokens' in response_dict and response_dict['flaggedTokens']:
 					self.suggestions.append(response_dict)
 
 			except Exception as e:
@@ -48,21 +44,21 @@ class SpellcheckAPI:
 		return self.suggestions
 
 	def get_replacements_list(self): 
-		flagged_tokens = self.response_dict["flaggedTokens"]
+		flagged_tokens = self.response_dict['flaggedTokens']
 
 		l = []
 
 		for flagged_token in flagged_tokens: 
 
-			offset = flagged_token["offset"]
-			token = flagged_token["token"]
-			suggestions = flagged_token["suggestions"]
+			offset = flagged_token['offset']
+			token = flagged_token['token']
+			suggestions = flagged_token['suggestions']
 
 			s = suggestions[0]
-			suggestion = s["suggestion"]
-			score = s["score"]
+			suggestion = s['suggestion']
+			score = s['score']
 
-			r = {"old": token, "new": suggestion, "offset": offset}
+			r = {'old': token, 'new': suggestion, 'offset': offset}
 
 			l.append(r)
 
