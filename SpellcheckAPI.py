@@ -1,15 +1,17 @@
+import ast
+import base64
+from json import dumps
+import requests
+
 class SpellcheckAPI:
 	
 	def __init__(self):
 		self.api = 'https://api.cognitive.microsoft.com/bing/v5.0/spellcheck/?'
 
-		self.auth_key = '95da5684bc6645a389bc35ba71732796'
+		self.auth_key = '90b9afa4d9244f85b858b57722cec7c2'
 		self.headers = { 'Ocp-Apim-Subscription-Key': self.auth_key }
 	
 	def spellcheck(self, text):
-		import ast, base64
-		import requests
-
 		# iterate through the string, in blocks of max_length characters
 
 		# split the text up by spaces, to make sure we aren't splitting words
@@ -41,7 +43,7 @@ class SpellcheckAPI:
 			except Exception as e:
 				print('[Errno {0}] {1}'.format(e.errno, e.strerror))
 
-		return self.suggestions
+		return dumps(self.suggestions, sort_keys = True, indent = 2, separators=(',', ': '))
 
 	def get_replacements_list(self): 
 		flagged_tokens = self.response_dict['flaggedTokens']
